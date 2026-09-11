@@ -1,122 +1,131 @@
-
 # Retail Pharmacy Intelligence Dashboard
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/abhijeetpatil-hub/Retail_pharmacy_intelligence_dashboard/main)
+A reproducible portfolio project that combines a public medicine-details dataset with a **clearly labeled synthetic retail-business simulation layer** for profitability, inventory movement, expiry-risk and competitor-pricing analytics.
 
+> **Important:** Medicine metadata in `data/pharmacy_data.csv` are source data. Retail price, purchase price, profit, monthly sales, expiry date and competitor price are simulated fields created for portfolio analytics; they are not observed pharmacy transactions.
 
+## Business Questions
 
-## 🚀 Project Overview
+- Which medicines appear most profitable under the simulated pricing assumptions?
+- Which simulated inventory records are closest to expiry?
+- Which products are slow-, medium- or fast-moving in the simulated sales layer?
+- How do simulated selling prices compare with simulated competitor prices?
+- Which manufacturers and medicines have stronger review/trust signals in the source data?
 
-An **interactive Streamlit dashboard** designed to help retail pharmacy owners, inventory managers, and business analysts monitor key performance indicators (KPIs), track sales performance, identify expiry risk, and make fast, data-driven decisions in real-time.
+## Source Data
 
-This dashboard transforms pharmacy sales and inventory data into **actionable business insights** through clean visualizations and interactive filters.
+The committed source file is `data/pharmacy_data.csv`.
 
----
+The repository notebook shows **11,825 rows and 9 source columns**: Medicine Name, Composition, Uses, Side_effects, Image URL, Manufacturer, Excellent Review %, Average Review %, and Poor Review %.
 
-## 🧠 Business Problem
+The schema and sample records match the widely circulated `Medicine_Details.csv` dataset. An external academic configuration manual attributes that dataset to **Navjot Singh — “11000 Medicine Details” (Kaggle)**:
 
-Retail pharmacies face multiple challenges:
-- Identifying top-selling vs under-performing medicines
-- Tracking profit performance across product categories
-- Detecting stock nearing expiry before it’s a loss
-- Making timely operational decisions with limited data visibility
+`https://www.kaggle.com/datasets/singhnavjot2062001/11000-medicine-details`
 
-This dashboard helps solve these challenges by providing a **central analytics platform** that highlights trends, risks, and performance metrics.
+Public mirrors of the same 11.8k-row structure also exist on Hugging Face.
 
----
+Because the original download receipt/metadata is not stored in this repository, the Kaggle attribution is recorded as **probable / externally corroborated**, not as a claim provable solely from Git history.
 
-## 📊 Key Insights & Decision Support
+See `docs/data_provenance.md` and `data/source_manifest.csv`.
 
-This dashboard enables stakeholders to:
-- **Spot high revenue drivers** (top-selling medicines, categories)
-- **Monitor profit margins** for different product lines
-- **Identify near-expiry stock** to take proactive action
-- **Slice data interactively** by date range, category, and product
-- **Compare performance across time periods**
+## Synthetic Business Layer
 
-These insights help reduce waste, improve inventory turnover, and optimize sales strategy.
+The canonical deterministic builder is `scripts/build_retail_analytics.py`.
 
----
+It adds simulated selling price, purchase price, profit, margin, monthly sales, expiry, competitor pricing and movement/risk fields.
 
-## 🧩 Tech Stack
+Simulation settings:
 
-- **Python**
-- **Streamlit**
-- **Pandas & NumPy**
-- **Matplotlib / Plotly**
-- **CSV dataset**
+- deterministic random seed: `42`
+- fixed reference date: **2026-04-01**
+- selling price: ₹50–₹500
+- purchase-cost factor: 60%–80% of selling price
+- competitor-price factor: 90%–115% of selling price
+- expiry offset: 30–719 days
+- monthly sales quantity: Poisson-style synthetic demand around λ=30
 
----
+The fixed date makes the simulation reproducible. It is not the source-data collection date.
 
-## 🔍 Dashboard Preview
+## Architecture
 
-“The dashboard presents the following insights:”
+```text
+data/pharmacy_data.csv
+        ↓
+scripts/build_retail_analytics.py
+        ↓
+outputs/retail_pharmacy_analytics.csv
+        ↓
+app.py (Streamlit)
+```
 
-### 📊 Sales Overview Dashboard
+The notebook is retained for exploratory analysis; the script is the canonical reproducible build path.
 
-![Sales Overview](visuals/dashboard_overview.png)
+## Repository Structure
 
-### ⚠️ Expiry & Inventory Risk
-![Expiry Analysis](visuals/dashboard_expiry.png)
+```text
+.github/workflows/ci.yml
+app.py
+data/
+  pharmacy_data.csv
+  source_manifest.csv
+docs/
+  data_provenance.md
+  simulation_design.md
+  limitations.md
+notebooks/
+  01_pharma_analysis.ipynb
+outputs/
+  retail_pharmacy_analytics.csv
+scripts/
+  build_retail_analytics.py
+  validate_repo.py
+requirements.txt
+README.md
+```
 
-📦 Folder Structure
-Retail_pharmacy_intelligence_dashboard/
-│
-├── data/ # Raw and cleaned datasets
-├── notebooks/ # Analysis notebooks
-├── outputs/ # Exported reports / visuals
-├── visuals/ # Dashboard screenshots
-├── app.py # Main Streamlit application
-├── README.md
-├── requirements.txt
+## Run Locally
 
----
-
-## 🛠 How to Run Locally
-
-1. Clone the repo:  
-   ```bash
-   git clone https://github.com/abhijeetpatil-hub/Retail_pharmacy_intelligence_dashboard.git
-
-2.Navigate to the project directory:
-cd Retail_pharmacy_intelligence_dashboard
-
-3.Install required dependencies:
-pip install -r requirements.txt
-
-4.Run the Streamlit application:
+```bash
+python -m pip install -r requirements.txt
+python scripts/build_retail_analytics.py
 streamlit run app.py
+```
 
-## 🚀 Run Online (Binder)
+## Dashboard KPIs
 
-This project can be launched directly in your browser using **Binder** (no installation required).  
-Click the badge at the top of this README or the link below:
+**Source-derived:** total records, unique medicines, unique manufacturers and review/trust indicators.
 
-👉 https://mybinder.org/v2/gh/abhijeetpatil-hub/Retail_pharmacy_intelligence_dashboard/main
+**Simulated:** average profit, simulated sales, expiry-risk counts, stock movement and competitor-price position.
 
+## Validation
 
-## 🎯 Target Users
+```bash
+python scripts/validate_repo.py
+```
 
-- Retail pharmacy owners
-- Hospital pharmacy managers
-- Inventory & operations teams
-- Healthcare business analysts
+The validator checks source row count/schema, generated analytics fields, fixed simulation reference date, explicit synthetic labeling, notebook hygiene and repository placeholders.
 
+## Skills Demonstrated
 
-## 🚀 Future Enhancements
+- data provenance
+- deterministic synthetic feature generation
+- Python analytics engineering
+- healthcare/pharmacy business analysis
+- Streamlit dashboard development
+- inventory-risk logic
+- reproducible repository design
 
-- Database integration (MySQL / PostgreSQL)
-- Automated daily data refresh
-- Role-based access for staff and managers
-- Integration with demand forecasting models
-- Exportable PDF / Excel reports
+## Limitations
 
+This is a **portfolio simulation**, not a dispensing, procurement, pricing or clinical system. Simulated fields are not evidence of actual medicine prices, margins, sales volumes, expiry dates, competitor prices or inventory movement. Review percentages and `trust_score` are not clinical efficacy measures.
 
-## 👤 Author
+See `docs/limitations.md`.
 
-**Abhijeet Patil**  
-Data Analytics | Business Intelligence | Healthcare Domain  
-GitHub: https://github.com/abhijeetpatil-hub
+## Interview Summary
 
+> I used an 11,825-row medicine-details dataset as the descriptive source layer, then built a deterministic synthetic retail layer for price, cost, profit, monthly movement, competitor pricing and expiry-risk analytics. I separate source from simulated fields, use seed 42 and a fixed April 2026 scenario date, generate the analytical CSV through a standalone script, and document source-attribution uncertainty rather than presenting unverified download history as fact.
 
+## Author
 
+**Abhijeet Vasantrao Patil**  
+GitHub: https://github.com/abhijeet9066-hub

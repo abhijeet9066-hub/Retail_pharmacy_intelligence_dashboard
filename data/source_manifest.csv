@@ -1,0 +1,5 @@
+asset,layer,status,provenance_or_generation,notes
+data/pharmacy_data.csv,source medicine metadata,probable public dataset attribution,"Matches 11,825-row Medicine_Details dataset; probable Kaggle source singhnavjot2062001/11000-medicine-details; original acquisition metadata not stored in repo"
+outputs/retail_pharmacy_analytics.csv,derived analytics,synthetic/reproducible,"Generated from source medicine metadata using seed 42 and reference date 2026-04-01"
+notebooks/01_pharma_analysis.ipynb,exploratory analysis,derived,"Notebook retained for EDA; canonical business-layer generation is the scripts builder"
+app.py,presentation layer,derived,"Streamlit dashboard consuming generated analytics CSV"
